@@ -67,3 +67,5 @@ the merge actually does. You can at least try and enforce some structure, so you
 
 * Create a `.github` folder and place a file `pull_request_template.md` that github will automatically pick up
 * Have a look at github once commited and try to make a PR!
+
+my change
