@@ -7,7 +7,7 @@ from sqlalchemy.engine.interfaces import Connectable
 from sqlalchemy.orm import sessionmaker
 
 from log_config.loggingconf import logger
-from utils.general import retrieve_env_var
+from util.general import retrieve_env_var
 
 
 class Database:

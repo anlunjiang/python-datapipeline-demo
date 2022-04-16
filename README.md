@@ -116,11 +116,34 @@ In this case it ensures any code breaking changes are rolled back, and the sessi
 database safety and lowers risk of locked tables, violating constraints and using up unnecessary resources. Using this is done by 
 wrapping the scope within a `with` statement  
 
+Once your engine, scope and sessions are made - you can use it to run raw SQL straight through the engine:
+```python
+def execute(self, sql_cmds: List):
+        """
+        Executes a list of sql commands using the self managed session
+        """
+        assert type(sql_cmds) == list, "SQL commands must be in list format"
+        with self.session_scope() as session:
+            for cmd in sql_cmds:
+                logger.debug(f"Executing SQL cmd: {cmd}")
+                session.execute(cmd)
+
+db.execute(["CREATE DATABASE IF NOT EXISTS test_db"])
+```
+
+You can then check that the database was created properly via the docker container
+`docker exec -it demo bash`
+
+However - the better way to run SQL commands is using the ORM - as raw sql can lead to some very hard to debug problems
+
 ### Using the ORM
 
 One of the best parts of SQLAlchemy is the ORM where you can programmatically dictate your table schema as objects. Each table is
 its own class inherited from a SQLAlchemy base class. This is produced from a factory function. Each declarative class definition inherits 
-from the class and updates the Base variable of its existence when run 
+from the class and updates the Base variable of its existence when run. 
+
+You can then query these class objects with the Query() method in SQLA:
+
 
 ## Alembic 
 
@@ -134,6 +157,8 @@ default to looking into when setup.
 with db.session_scope() as session:
   session.execute(...)
 ```
+
+
 
 
 # Project DB
