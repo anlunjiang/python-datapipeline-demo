@@ -14,7 +14,7 @@ This project aims to cover:
   * PR Templates for faster and more consistent code reviews 
 * Database connections and ORMs
   * Organise your database connections using an ORM instead of plain SQL
-  * track your database changes with Alembic
+  * track your database schema changes with Alembic
   * Reading and writing from databases using the SQLA ORM efficiently
 * Serving frontends quickly for POCs and Dashboards using Streamlit
 
@@ -68,29 +68,30 @@ the merge actually does. You can at least try and enforce some structure, so you
 * Create a `.github` folder and place a file `pull_request_template.md` that github will automatically pick up
 * Have a look at github once commited and try to make a PR!
 
-# SQLAlchemy
+# Database Connectors, ORMS and Version Control
 
+## SQLAlchemy
 SQLAlchemy is an ORM tool for python to enable a programmatic approach to database management and querying. Rather
 than dealing with the differences between specific dialects of SQL - you leverage a common framework that can talk to 
-most relational databases. 
+most relational databases via its ORM. 
 
 This great for a few reasons:
 * No more blocks of SQL Text - organise your database transformations programmatically 
 * Write once, and only once. Database migrations are a thing - whether it be due to pricing or strategic direction
-  * If your framework is database agnostic - it's a lot easier to migrate over with less refactoring
+  * If your ORM framework is database agnostic - it's a lot easier to migrate over with less refactoring
 * Database agnostic means you can test database writes and reads in unit tests without pinging a live db
   * pytest in-memory db store sqlite can easily validate logic written for mssql if you mock the SQLAlchemy engine
 * Compatible with Alembic! More on that later
 
-## Engine
+### Engine
 Within SQLAlchemy - the engine is the entry point for any SQLA application. It contains details on how to connect to the db
 (in most cases via a connection string). The engine object can talk directly to the db, or even better passed to a Session object
 to work with the ORM
-## Session
+### Session
 Sessions establishes the way database actions are transacted. Within the session it is associated with the engine you parse in,
 and you can return and modify ORM objects. This isn't commited until the session is instructed to do so. 
 It also can rollback changes if things go wrong. So only valid database changes are made - db integrity is maintained
-## SessionScope
+### SessionScope
 This is a custom made object that I use to wrap the session around a trasactional scope. As declated before sessions can rollback,
 but only if you tell it to. The context manager here ensures each session follows a set of rules for making database changes  
 
@@ -112,9 +113,32 @@ def session_scope(self):
 ```
 
 In this case it ensures any code breaking changes are rolled back, and the session is always closed once done. This ensures
-database safety and lowers risk of locked tables, violating constraints and using up unnecessary resources. 
+database safety and lowers risk of locked tables, violating constraints and using up unnecessary resources. Using this is done by 
+wrapping the scope within a `with` statement  
+
+### Using the ORM
+
+One of the best parts of SQLAlchemy is the ORM where you can programmatically dictate your table schema as objects. Each table is
+its own class inherited from a SQLAlchemy base class. This is produced from a factory function. Each declarative class definition inherits 
+from the class and updates the Base variable of its existence when run 
+
+## Alembic 
+
+Alembic is great for tracking schema migrations
+
+Create a directory called `migrations` this will be where all your migration scripts will live and will be where alembic will
+default to looking into when setup.
+`alembic init migrations`
+
+```python 
+with db.session_scope() as session:
+  session.execute(...)
+```
+
 
 # Project DB
 
 This project is for demo purposes only - so one of the quickest ways to spin up a lightweight db is the docker mysql image.
 Using Docker compose its easy to configure and setup a container for demonstration purposes
+
+
