@@ -1,25 +1,16 @@
 import os
 import subprocess
 
-from utils.general import retrieve_env_var
-
 
 def setup_db_environment():
     os.environ["DB_USER"] = "root"
     os.environ["DB_PWD"] = "1234"
     os.environ["DB_HOST"] = "localhost"
-    os.environ["DB_PORT"] = "3306"
     os.environ["DB_SCHEMA"] = "demo"
 
 
 def run_mysql_docker_container():
-    port = retrieve_env_var("DB_PORT")
-    container_name = "demo"
-    env_details = f"MYSQL_ROOT_PASSWORD={retrieve_env_var('DB_PWD')}"
-
-    stmt = f"docker container run -p {port} -d --name {container_name} -e {env_details} --platform linux/amd64 mysql"
-
-    subprocess.check_output(stmt, shell=True)
+    subprocess.check_output("docker-compose up -d", shell=True)
 
 
 def main():

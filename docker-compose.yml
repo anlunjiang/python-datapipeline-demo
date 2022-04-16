@@ -1,0 +1,8 @@
+services:
+  mysql:
+    image: mysql
+    container_name: demo
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PWD}
+    platform: linux/amd64
+    ports: [3306]

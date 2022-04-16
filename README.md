@@ -70,3 +70,51 @@ the merge actually does. You can at least try and enforce some structure, so you
 
 # SQLAlchemy
 
+SQLAlchemy is an ORM tool for python to enable a programmatic approach to database management and querying. Rather
+than dealing with the differences between specific dialects of SQL - you leverage a common framework that can talk to 
+most relational databases. 
+
+This great for a few reasons:
+* No more blocks of SQL Text - organise your database transformations programmatically 
+* Write once, and only once. Database migrations are a thing - whether it be due to pricing or strategic direction
+  * If your framework is database agnostic - it's a lot easier to migrate over with less refactoring
+* Database agnostic means you can test database writes and reads in unit tests without pinging a live db
+  * pytest in-memory db store sqlite can easily validate logic written for mssql if you mock the SQLAlchemy engine
+* Compatible with Alembic! More on that later
+
+## Engine
+Within SQLAlchemy - the engine is the entry point for any SQLA application. It contains details on how to connect to the db
+(in most cases via a connection string). The engine object can talk directly to the db, or even better passed to a Session object
+to work with the ORM
+## Session
+Sessions establishes the way database actions are transacted. Within the session it is associated with the engine you parse in,
+and you can return and modify ORM objects. This isn't commited until the session is instructed to do so. 
+It also can rollback changes if things go wrong. So only valid database changes are made - db integrity is maintained
+## SessionScope
+This is a custom made object that I use to wrap the session around a trasactional scope. As declated before sessions can rollback,
+but only if you tell it to. The context manager here ensures each session follows a set of rules for making database changes  
+
+```python
+@contextmanager
+def session_scope(self):
+    """
+    Provide a transactional scope around a series of operations
+    """
+    session = self._Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+```
+
+In this case it ensures any code breaking changes are rolled back, and the session is always closed once done. This ensures
+database safety and lowers risk of locked tables, violating constraints and using up unnecessary resources. 
+
+# Project DB
+
+This project is for demo purposes only - so one of the quickest ways to spin up a lightweight db is the docker mysql image.
+Using Docker compose its easy to configure and setup a container for demonstration purposes
