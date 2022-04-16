@@ -1,10 +1,26 @@
+import pandas as pd
 import yfinance as yf
 
+from log_config.loggingconf import logger
+from schemas.connection import Database
+from util.general import retrieve_env_var
 
-def get_data():
-    aapl_df = yf.download(
-        "LLOY.L",
-        start="2021-01-01",
-        end="2022-01-01",
+
+def read_from_csv():
+    lbg_df = pd.read_csv(r"data/lbg_stock_price.csv")
+    lbg_df["ADJ_CLOSE"] = lbg_df["Adj Close"]
+    lbg_df.drop("Adj Close", axis=1, inplace=True)
+    return lbg_df.reset_index(drop=True)
+
+
+def pandas_append_sql(df: pd.DataFrame, table: str):
+    db = Database()
+    logger.info(f"Appending {df.shape[0]} rows to table: {table}")
+    df.to_sql(
+        name=table,
+        con=db.engine,
+        schema=retrieve_env_var("DB_SCHEMA"),
+        if_exists="append",
+        index=False,
     )
-    return aapl_df.reset_index()
+    logger.info("Complete")
