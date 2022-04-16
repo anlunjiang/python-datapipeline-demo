@@ -142,8 +142,7 @@ One of the best parts of SQLAlchemy is the ORM where you can programmatically di
 its own class inherited from a SQLAlchemy base class. This is produced from a factory function. Each declarative class definition inherits 
 from the class and updates the Base variable of its existence when run. 
 
-You can then query these class objects with the Query() method in SQLA:
-
+You can then query these class objects with the Query() method in SQLA
 
 ## Alembic 
 
