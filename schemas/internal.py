@@ -12,5 +12,5 @@ class LBGMarketDataDaily(Base):
     HIGH = Column(Float(precision=5))
     LOW = Column(Float(precision=5))
     CLOSE = Column(Float(precision=5))
-    ADJ_CLOSE = Column(Float(precision=5))
     VOLUME = Column(Integer)
+    TEST_COL = Column(Integer)

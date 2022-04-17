@@ -1,5 +1,4 @@
 import pandas as pd
-import yfinance as yf
 
 from log_config.loggingconf import logger
 from schemas.connection import Database

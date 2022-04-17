@@ -9,7 +9,7 @@ def setup_db_environment():
     os.environ["DB_PWD"] = "1234"
     os.environ["DB_HOST"] = "localhost"
     os.environ["DB_SCHEMA"] = "demo"
-    os.environ["DB_PORT"] = "61782"
+    os.environ["DB_PORT"] = "64282"
     os.environ["DB_NAME"] = "demo"
 
 
